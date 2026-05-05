@@ -1,0 +1,3 @@
+[submodule "ulisp-picocalc"]
+	path = ulisp-picocalc
+	url = https://github.com/technoblogy/ulisp-picocalc
