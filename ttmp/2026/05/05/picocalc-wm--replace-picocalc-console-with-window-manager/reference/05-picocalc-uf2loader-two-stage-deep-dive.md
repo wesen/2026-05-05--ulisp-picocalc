@@ -1,33 +1,21 @@
 ---
-Title: ""
-Ticket: ""
-Status: ""
-Topics: []
-DocType: ""
-Intent: ""
-Owners: []
-RelatedFiles:
-    - Path: PicoCalc/Code/pico_multi_booter/sd_boot/main.c
-      Note: Legacy stock Bootloader v1.0 BIN flashing behavior
-    - Path: uf2loader/README.md
-      Note: Installation
-    - Path: uf2loader/common/bootloader/proginfo.c
-      Note: Proginfo vector-table metadata used by stage3 and UI
-    - Path: uf2loader/stage3/stage3.c
-      Note: Flashed stage3 boot decision logic and app/menu launch path
-    - Path: uf2loader/stage3/uf2.c
-      Note: Stage3 loader for BOOT2040.UF2 into SRAM
-    - Path: uf2loader/ui/main.c
-      Note: Menu UI startup
-    - Path: uf2loader/ui/uf2.c
-      Note: Menu-side UF2 app flasher and flash safety checks
-ExternalSources: []
-Summary: ""
-LastUpdated: 0001-01-01T00:00:00Z
-WhatFor: ""
-WhenToUse: ""
+title: PicoCalc UF2 Loader — Two-Stage Bootloader Deep Dive
+aliases:
+  - PicoCalc UF2 Loader Deep Dive
+  - UF2 Loader on PicoCalc
+  - PicoCalc bootloader two-stage architecture
+tags:
+  - article
+  - picocalc
+  - rp2040
+  - bootloader
+  - uf2
+  - firmware
+status: active
+type: article
+created: 2026-05-05
+repo: /home/manuel/code/wesen/2026-05-05--ulisp-picocalc
 ---
-
 
 # PicoCalc UF2 Loader — Two-Stage Bootloader Deep Dive
 
@@ -35,8 +23,8 @@ This note explains how the `pelrun/uf2loader` bootloader for the ClockworkPi Pic
 
 > [!summary]
 > - The old stock PicoCalc Bootloader v1.0 loads specially linked `.bin` files from `/firmware`; ordinary UF2-to-BIN conversion is not enough.
-> - `uf2loader` uses a two-step design: a tiny flashed bootloader in Pico flash plus a menu UI loaded from `BOOT2040.UF2` on the SD card.
-> - Once installed, normal Arduino/Pico `.uf2` applications can live in `/pico1-apps/` and be selected from a menu on the PicoCalc display.
+> - `uf2loader` uses a two-step design: a tiny flashed bootloader in Pico flash plus a menu UI loaded from `BOOT2040.UF2` or `BOOT2350.UF2` on the SD card.
+> - Once installed, normal Arduino/Pico `.uf2` applications can live in `/pico1-apps/` for RP2040 or `/pico2-apps/` for RP2350 and be selected from a menu on the PicoCalc display.
 > - The menu is not embedded in the small flashed bootloader; it is itself a UF2 program loaded from SD into RAM.
 
 ## Why this note exists
@@ -66,16 +54,20 @@ downloads/uf2loader-v2.4.1/diag_pico.uf2              # official diagnostic file
 ttmp/2026/05/05/picocalc-wm--replace-picocalc-console-with-window-manager/
 ```
 
-The SD card was prepared with:
+The SD card was prepared with both Pico 1 and Pico 2W assets, using separate app folders and explicit names so the two board targets cannot overwrite one another:
 
 ```text
 /BOOT2040.UF2
+/BOOT2350.UF2
 /pico1-apps/uLisp_4.8f_arduino_pico_4.5.0.uf2
+/pico2-apps/uLisp_4.8f_pico2w_arduino-pico-4.5.0.uf2
 /firmware/uf2loader_bootloader_pico_v2.4.1.uf2
 /firmware/uf2loader_diag_pico_v2.4.1.uf2
+/firmware/uf2loader_bootloader_pico2_v2.4.1.uf2
+/firmware/uf2loader_diag_pico2_v2.4.1.uf2
 ```
 
-The last two files in `/firmware` are convenience copies. They are not how the new bootloader is installed. The bootloader itself must be flashed to the Pico via BOOTSEL or picotool.
+The files in `/firmware` are convenience copies. They are not how the new bootloader is installed. The bootloader itself must be flashed to the Pico or Pico 2W via BOOTSEL or picotool. The SD-root `BOOT2040.UF2` and `BOOT2350.UF2` files are the menu UI programs loaded by the already-flashed bootloader.
 
 ## The two bootloader families
 
@@ -620,6 +612,38 @@ A convenience copy was also placed on the SD card:
 
 If you want to verify SD-card readability before installing the bootloader, flash `diag_pico.uf2` via BOOTSEL instead. It is a diagnostic program, not the bootloader.
 
+### Pico 2W flashing files
+
+For a Pico 2 or Pico 2W RP2350 PicoCalc, flash:
+
+```text
+bootloader_pico2.uf2
+```
+
+Do not flash `BOOT2350.UF2` to the Pico 2W itself. `BOOT2350.UF2` belongs on the SD card root. The file mapping is:
+
+| Board | Flash this to the Pico module | Put this on SD root | Put apps here |
+|---|---|---|---|
+| Pico / Pico W (RP2040) | `bootloader_pico.uf2` | `BOOT2040.UF2` | `/pico1-apps/` |
+| Pico 2 / Pico 2W (RP2350) | `bootloader_pico2.uf2` | `BOOT2350.UF2` | `/pico2-apps/` |
+
+Local official release files for Pico 2W are:
+
+```text
+/home/manuel/code/wesen/2026-05-05--ulisp-picocalc/downloads/uf2loader-v2.4.1/BOOT2350.uf2
+/home/manuel/code/wesen/2026-05-05--ulisp-picocalc/downloads/uf2loader-v2.4.1/bootloader_pico2.uf2
+/home/manuel/code/wesen/2026-05-05--ulisp-picocalc/downloads/uf2loader-v2.4.1/diag_pico2.uf2
+```
+
+The SD card currently has explicit Pico 2W copies:
+
+```text
+/BOOT2350.UF2
+/pico2-apps/uLisp_4.8f_pico2w_arduino-pico-4.5.0.uf2
+/firmware/uf2loader_bootloader_pico2_v2.4.1.uf2
+/firmware/uf2loader_diag_pico2_v2.4.1.uf2
+```
+
 ## How to compile UF2 Loader
 
 The upstream build instructions are:
@@ -718,6 +742,47 @@ scp build-4.5.0/ulisp-picocalc-sketch.ino.uf2 \
 
 This keeps the uLisp build in normal Arduino form. The UF2 Loader menu handles flashing it into the app area.
 
+### Building and adding a Pico 2W uLisp UF2 app
+
+The Pico 2W build uses the RP2350 board target exposed by the same Earle Philhower Arduino-Pico core:
+
+```bash
+arduino-cli compile \
+  --fqbn rp2040:rp2040:rpipico2w \
+  --build-path build-pico2w-4.5.0 \
+  --warnings all \
+  ulisp-picocalc-sketch
+```
+
+The Pico 2W build output was:
+
+```text
+build-pico2w-4.5.0/ulisp-picocalc-sketch.ino.uf2  968192 bytes
+build-pico2w-4.5.0/ulisp-picocalc-sketch.ino.bin  483820 bytes
+```
+
+Compile summary:
+
+```text
+Sketch uses 458,432 bytes (10%) of program storage space.
+Global variables use 390,812 bytes (74%) of dynamic memory.
+Leaves 133,476 bytes for local variables.
+```
+
+For UF2 Loader on Pico 2W, copy the UF2 into `/pico2-apps/` with a name that states the target board clearly:
+
+```bash
+scp build-pico2w-4.5.0/ulisp-picocalc-sketch.ino.uf2 \
+  manuel@192.168.0.57:"/Volumes/NO NAME/pico2-apps/uLisp_4.8f_pico2w_arduino-pico-4.5.0.uf2"
+```
+
+Do not place Pico 2W builds over the Pico 1 app names. A single SD card can safely hold both app sets if the folder split is maintained:
+
+```text
+/pico1-apps/uLisp_4.8f_arduino_pico_4.5.0.uf2
+/pico2-apps/uLisp_4.8f_pico2w_arduino-pico-4.5.0.uf2
+```
+
 ## Why this fixes the uLisp workflow
 
 The failed stock bootloader path required solving four problems at once:
@@ -734,9 +799,13 @@ There is still one issue to watch: applications that erase or program flash them
 ## Recommended working rules
 
 - Use `uf2loader` for development builds.
-- Put app UF2s under `/pico1-apps/`, not `/firmware/`.
-- Keep `BOOT2040.UF2` on the SD card root.
-- Flash `bootloader_pico.uf2` only via BOOTSEL or picotool.
+- Put RP2040/Pico 1 app UF2s under `/pico1-apps/`, not `/firmware/`.
+- Put RP2350/Pico 2 app UF2s under `/pico2-apps/`, not `/firmware/`.
+- Keep `BOOT2040.UF2` on the SD card root for Pico/Pico W.
+- Keep `BOOT2350.UF2` on the SD card root for Pico 2/Pico 2W.
+- Flash `bootloader_pico.uf2` only to Pico/Pico W via BOOTSEL or picotool.
+- Flash `bootloader_pico2.uf2` only to Pico 2/Pico 2W via BOOTSEL or picotool.
+- Name Pico 2W app builds explicitly with `pico2w` in the filename so they cannot be confused with Pico 1 builds.
 - Do not try to make stock bootloader `.bin` files by extracting UF2 payloads.
 - If stock bootloader v1.0 support becomes necessary, start from ClockworkPi's `memmap_default.ld.mp.rp2040`, not from a random PicoCalc bootloader fork.
 - Validate any legacy `.bin` before copying it to `/firmware`: first word must be a stack pointer, second word must be a reset vector near `0x10032000`.
