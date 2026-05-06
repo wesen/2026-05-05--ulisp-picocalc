@@ -13,12 +13,9 @@ SD_PATH  := $(SD_VOL)/firmware
 SD_UF2   := PicoCalc_uLisp_4.8f.uf2
 SD_BIN   := uLisp_4.8f.bin
 
-.PHONY: build upload upload-uf2 upload-bin clean
+.PHONY: build upload upload-uf2 upload-bin extract unmount clean
 
-build: $(UF2) $(BIN)
-
-$(UF2) $(BIN): $(SKETCH)/$(SKETCH).ino
-	mkdir -p $(BUILD)
+build: $(UF2)
 	arduino-cli compile \
 		--fqbn $(FQBN) \
 		--build-path $(BUILD) \
@@ -26,6 +23,9 @@ $(UF2) $(BIN): $(SKETCH)/$(SKETCH).ino
 		$(SKETCH)
 	@echo "=== Build outputs ==="
 	@ls -la $(UF2) $(BIN)
+
+extract: $(UF2)
+	python3 scripts/uf2-to-bin.py $(UF2) $(BIN)
 
 upload: upload-uf2 upload-bin
 
