@@ -139,6 +139,15 @@ void appendBackLine(const char *s) {
   appendBackChar('\n');
 }
 
+void clearBackBuffer() {
+  for (int row = 0; row < BackBufferRows; row++) clearBackRow(row);
+  backBuffer.currentRow = 0;
+  backBuffer.currentCol = 0;
+  backBuffer.count = 1;
+  backBuffer.viewportStart = 0;
+  backBuffer.followTail = true;
+}
+
 // -----------------------------------------------------------------------------
 // Edit buffer: mutable active input line
 // -----------------------------------------------------------------------------
@@ -198,13 +207,54 @@ void moveCursorRight() {
   if (editBuffer.cursor < editBuffer.len) editBuffer.cursor++;
 }
 
+void runFakeEvaluator(const char *input) {
+  if (strcmp(input, "/help") == 0) {
+    appendBackLine("commands: /help /spam /clear /status");
+    appendBackLine("normal text is echoed as fake evaluator output");
+    return;
+  }
+
+  if (strcmp(input, "/spam") == 0) {
+    for (int i = 0; i < 48; i++) {
+      appendBackString("spam line ");
+      appendBackUnsigned(i);
+      appendBackString(": abcdefghijklmnopqrstuvwxyz 0123456789");
+      appendBackChar('\n');
+    }
+    return;
+  }
+
+  if (strcmp(input, "/clear") == 0) {
+    clearBackBuffer();
+    appendBackLine("back buffer cleared");
+    return;
+  }
+
+  if (strcmp(input, "/status") == 0) {
+    appendBackString("status rows=");
+    appendBackUnsigned(backBuffer.count);
+    appendBackString(" viewport=");
+    appendBackUnsigned(backBuffer.viewportStart);
+    appendBackString(" input-len=");
+    appendBackUnsigned(editBuffer.len);
+    appendBackChar('\n');
+    return;
+  }
+
+  appendBackString("fake-eval: ");
+  appendBackString(input);
+  appendBackChar('\n');
+}
+
 void commitEditBuffer() {
+  char committed[InputBufferSize];
+  strncpy(committed, editBuffer.text, sizeof(committed));
+  committed[sizeof(committed) - 1] = '\0';
+
   appendBackString("> ");
-  for (uint16_t i = 0; i < editBuffer.len; i++) appendBackChar(editBuffer.text[i]);
+  appendBackString(committed);
   appendBackChar('\n');
-  appendBackString("echo: ");
-  for (uint16_t i = 0; i < editBuffer.len; i++) appendBackChar(editBuffer.text[i]);
-  appendBackChar('\n');
+  runFakeEvaluator(committed);
   resetEditBuffer();
 }
 
@@ -396,7 +446,7 @@ void setup() {
   Serial.begin(115200);
   delay(500);
 
-  for (int row = 0; row < BackBufferRows; row++) clearBackRow(row);
+  clearBackBuffer();
   resetEditBuffer();
 
   initDisplay();
@@ -404,7 +454,7 @@ void setup() {
 
   appendBackLine("PicoCalc REPL primitive sketch");
   appendBackLine("Type text. Enter commits. Arrows are logged/tested.");
-  appendBackLine("Goal: validate display + keyboard before uLisp integration.");
+  appendBackLine("Commands: /help /spam /clear /status");
   renderAll();
 }
 

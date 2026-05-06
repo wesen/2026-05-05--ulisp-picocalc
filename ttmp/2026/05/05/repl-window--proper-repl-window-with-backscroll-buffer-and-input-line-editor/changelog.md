@@ -56,3 +56,14 @@ Recorded initial primitive sketch implementation commit c46ef29c3d3f41772148d1aa
 
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Diary updated with initial implementation commit hash
 
+
+## 2026-05-05
+
+Primitive sketch Step 2: added fake evaluator commands (/help, /spam, /clear, /status) for deterministic output, wrapping, and scroll stress tests; compile succeeds.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/repl-window-primitives/repl-window-primitives.ino — Added fake evaluator commands and clear-back-buffer helper
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Recorded Step 2
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/03-primitive-picocalc-experiment-implementation-guide.md — Documented fake evaluator commands
+

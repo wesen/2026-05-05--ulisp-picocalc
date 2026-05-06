@@ -181,3 +181,100 @@ Compile result:
 Sketch uses 77664 bytes (3%) of program storage space. Maximum is 2093056 bytes.
 Global variables use 19888 bytes (7%) of dynamic memory, leaving 242256 bytes for local variables. Maximum is 262144 bytes.
 ```
+
+## Step 2: Add fake evaluator commands for scroll and wrapping stress tests
+
+I added a tiny fake evaluator to the primitive sketch. This keeps the sketch uLisp-free while allowing us to exercise evaluator-like output paths: normal text now produces `fake-eval: ...`, `/help` prints command help, `/status` prints buffer state, `/clear` clears the transcript, and `/spam` prints many deterministic long lines.
+
+This step is useful because the back buffer and renderer need to handle output bursts, line wrapping, and row rollover before the same primitives are ported to `pserial()` in the uLisp firmware.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 1)
+
+**Assistant interpretation:** Continue working through primitive-sketch tasks one at a time, committing focused increments and recording the work.
+
+**Inferred user intent:** Build confidence in the primitive UI model through small, reviewable steps before uLisp integration.
+
+**Commit (code):** pending — will be recorded after this step is committed.
+
+### What I did
+
+- Added `clearBackBuffer()`.
+- Added `runFakeEvaluator(const char *input)`.
+- Changed `commitEditBuffer()` so it snapshots the committed input, appends the prompt/input line, runs fake evaluation, and then resets the edit buffer.
+- Added commands:
+  - `/help`,
+  - `/spam`,
+  - `/clear`,
+  - `/status`.
+- Updated startup text to advertise the commands.
+- Updated primitive tasks to mark fake evaluator mode complete.
+- Updated the primitive implementation guide with command references.
+- Recompiled with:
+
+```bash
+arduino-cli compile \
+  --fqbn rp2040:rp2040:rpipico \
+  --build-path build-repl-window-primitives \
+  --warnings all \
+  repl-window-primitives
+```
+
+### Why
+
+The renderer needs deterministic stress output before hardware testing and before uLisp integration. `/spam` gives a repeatable way to generate enough text to test wrapping, scrollback, viewport following, and back-buffer rollover.
+
+### What worked
+
+- The sketch still compiles successfully.
+- Program storage changed from 77,664 bytes to 78,224 bytes.
+- Global RAM use remained 19,888 bytes.
+
+### What didn't work
+
+- No compile failures occurred.
+- The same expected `TFT_eSPI` touch warning remains:
+
+```text
+warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+```
+
+### What I learned
+
+A fake evaluator is enough to test the intended `pserial()` output model without embedding uLisp. The experiment can now produce short output, status output, clear behavior, and long deterministic output from inside the primitive UI shell.
+
+### What was tricky to build
+
+`commitEditBuffer()` must copy the input before running commands because `/clear` and future commands can mutate transcript state while the edit buffer is about to reset. I used a local `committed[InputBufferSize]` snapshot before appending and evaluating.
+
+### What warrants a second pair of eyes
+
+- Whether `/clear` should preserve startup/help lines or fully reset the transcript as it does now.
+- Whether the fake evaluator should eventually support scripted output timings, not just immediate bursts.
+
+### What should be done in the future
+
+- Test `/spam` on hardware to evaluate redraw flicker.
+- Add dirty-row rendering if `/spam` exposes slow full-screen redraws.
+
+### Code review instructions
+
+Review these symbols:
+
+```text
+clearBackBuffer
+runFakeEvaluator
+commitEditBuffer
+```
+
+Validate with the same `arduino-cli compile` command and, on hardware, type `/help`, `/status`, `/spam`, and `/clear`.
+
+### Technical details
+
+Compile result:
+
+```text
+Sketch uses 78224 bytes (3%) of program storage space. Maximum is 2093056 bytes.
+Global variables use 19888 bytes (7%) of dynamic memory, leaving 242256 bytes for local variables. Maximum is 262144 bytes.
+```

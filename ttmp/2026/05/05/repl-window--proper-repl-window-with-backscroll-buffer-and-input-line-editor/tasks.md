@@ -128,7 +128,7 @@
 
 - [ ] Add input history ring to primitive sketch.
 - [ ] Add scrollback mode using confirmed key bindings.
-- [ ] Add fake evaluator output mode for deterministic multi-line output stress tests.
+- [x] Add fake evaluator output mode for deterministic multi-line output stress tests.
 - [ ] Add parenthesis highlighting against `EditBufferState`.
 - [ ] Add autocomplete prototype against `EditBufferState`.
 

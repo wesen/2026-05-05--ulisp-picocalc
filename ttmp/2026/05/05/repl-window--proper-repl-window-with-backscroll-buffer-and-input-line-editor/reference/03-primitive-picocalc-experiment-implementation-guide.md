@@ -55,6 +55,15 @@ Primary file:
 /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/repl-window-primitives/repl-window-primitives.ino
 ```
 
+Fake evaluator commands:
+
+```text
+/help    show command help
+/spam    print 48 deterministic long lines for wrap/scroll testing
+/clear   clear the transcript back buffer
+/status  print buffer and input status
+```
+
 Expected compile warnings:
 
 - `TOUCH_CS pin not defined` from `TFT_eSPI`; this is expected because the sketch does not use touch.
@@ -157,15 +166,17 @@ On hardware:
 2. Confirm the startup text appears.
 3. Type `hello`.
 4. Confirm `hello` appears only in the bottom edit area.
-5. Press Backspace.
-6. Confirm the edit area changes to `hell`.
-7. Press Enter.
-8. Confirm transcript receives:
+5. Type `/help` and press Enter to verify command output.
+6. Type `/spam` and press Enter to verify multi-line wrapping and scroll stress output.
+7. Press Backspace.
+8. Confirm the edit area changes to `hell`.
+9. Press Enter.
+10. Confirm transcript receives:
 
 ```text
 > hell
 echo: hell
 ```
 
-9. Press arrows/Delete/Home/End and write down logged key codes.
-10. Generate enough committed lines to fill the screen and confirm scrolling.
+11. Press arrows/Delete/Home/End and write down logged key codes.
+12. Generate enough committed lines to fill the screen and confirm scrolling.
