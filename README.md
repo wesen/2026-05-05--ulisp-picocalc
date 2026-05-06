@@ -218,6 +218,12 @@ A durable article-style project report was also written in the Obsidian vault:
 
 It is the best single narrative overview of the backbuffer/REPL integration work.
 
+## reMarkable journal export
+
+Selected pages from the development journal are exported as annotated PDFs:
+
+- [`#006 - 2026-04-05 pp78-81.pdf`](#006%20-%202026-04-05%20pp78-81.pdf) — REPL window design sketches and implementation notes.
+
 ## Git notes
 
 This repository contains a nested Git repository at `ulisp-picocalc/`.  Push order matters:
