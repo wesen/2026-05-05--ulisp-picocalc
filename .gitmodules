@@ -1,3 +1,12 @@
 [submodule "ulisp-picocalc"]
 	path = ulisp-picocalc
-	url = https://github.com/technoblogy/ulisp-picocalc
+	url = https://github.com/technoblogy/ulisp-picocalc.git
+[submodule "ulisp-wasm"]
+	path = ulisp-wasm
+	url = https://github.com/eliot-akira/ulisp-wasm.git
+[submodule "PicoCalc"]
+	path = PicoCalc
+	url = https://github.com/clockworkpi/PicoCalc.git
+[submodule "arduino_picocalc_kbd"]
+	path = arduino_picocalc_kbd
+	url = https://github.com/cuu/arduino_picocalc_kbd.git
