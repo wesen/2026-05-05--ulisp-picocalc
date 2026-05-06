@@ -431,3 +431,71 @@ ui/lib/usb_msc/usb_msc.c:25:3: error: too many arguments to function 'tusb_init'
 - Cross-check app flashing in `uf2loader/ui/uf2.c`.
 - Cross-check proginfo storage in `uf2loader/common/bootloader/proginfo.c`.
 - Cross-check legacy stock bootloader expectations in `PicoCalc/Code/pico_multi_booter/sd_boot/main.c`.
+
+---
+
+## Step 6: Download and install Pico2W UF2 Loader assets and uLisp app
+
+Downloaded the Pico2/RP2350 UF2 Loader assets from the official `pelrun/uf2loader` v2.4.1 release and installed them onto the PicoCalc SD card without overwriting any Pico1 firmware files. Also uploaded the Pico2W uLisp build into the `pico2-apps` folder with an explicit filename.
+
+### Prompt Context
+
+**User prompt (verbatim):** "go ahead"
+
+**Assistant interpretation:** Proceed with downloading the Pico2/Pico2W UF2 Loader files and preparing the SD card for Pico2W booting.
+
+**Inferred user intent:** Keep Pico1 and Pico2W firmware assets side by side on the same SD card, with names clear enough to avoid flashing the wrong board target.
+
+### What I did
+
+- Downloaded official UF2 Loader v2.4.1 Pico2 assets:
+  - `BOOT2350.uf2`
+  - `bootloader_pico2.uf2`
+  - `diag_pico2.uf2`
+- Uploaded to SD card:
+  - `/BOOT2350.UF2`
+  - `/pico2-apps/uLisp_4.8f_pico2w_arduino-pico-4.5.0.uf2`
+  - `/firmware/uf2loader_bootloader_pico2_v2.4.1.uf2`
+  - `/firmware/uf2loader_diag_pico2_v2.4.1.uf2`
+- Used explicit `pico2`, `pico2w`, and `2350` naming to avoid overwriting Pico1 files.
+- Synced and unmounted the SD card cleanly.
+
+### What worked
+
+- The SD card was writable.
+- Pico2 assets downloaded cleanly from GitHub release `v2.4.1`.
+- Pico2W uLisp UF2 was already built locally and uploaded under `pico2-apps`.
+
+### What didn't work
+
+- N/A
+
+### What I learned
+
+- The same SD card can hold both Pico1 and Pico2 UF2 Loader menu files:
+  - `/BOOT2040.UF2` for Pico/Pico W
+  - `/BOOT2350.UF2` for Pico 2/Pico 2W
+- App folders are target-specific:
+  - `/pico1-apps/` for RP2040 apps
+  - `/pico2-apps/` for RP2350 apps
+
+### What should be done in the future
+
+- For Pico2W hardware, flash `uf2loader_bootloader_pico2_v2.4.1.uf2` via BOOTSEL.
+- Then hold Up/F1/F5 at power-on to enter the menu and select `uLisp_4.8f_pico2w_arduino-pico-4.5.0.uf2`.
+
+### Technical details
+
+Downloaded files:
+
+```text
+downloads/uf2loader-v2.4.1/BOOT2350.uf2          89,600 bytes
+downloads/uf2loader-v2.4.1/bootloader_pico2.uf2  14,336 bytes
+downloads/uf2loader-v2.4.1/diag_pico2.uf2        29,696 bytes
+```
+
+Uploaded Pico2W uLisp app:
+
+```text
+/Volumes/NO NAME/pico2-apps/uLisp_4.8f_pico2w_arduino-pico-4.5.0.uf2  968,192 bytes
+```

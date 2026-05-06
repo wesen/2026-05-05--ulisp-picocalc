@@ -47,3 +47,12 @@ Step 5: Wrote Obsidian ARTICLE deep dive on UF2 Loader two-stage architecture, c
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/picocalc-wm--replace-picocalc-console-with-window-manager/reference/05-picocalc-uf2loader-two-stage-deep-dive.md — Ticket copy of vault report
 - /home/manuel/code/wesen/obsidian-vault/Projects/2026/05/05/ARTICLE - PicoCalc UF2 Loader - Two-Stage Bootloader Deep Dive.md — Vault report
 
+
+## 2026-05-05
+
+Step 6: Downloaded official UF2 Loader Pico2 assets, uploaded BOOT2350.UF2 and Pico2W uLisp UF2 to SD card with explicit names, then unmounted SD cleanly.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/picocalc-wm--replace-picocalc-console-with-window-manager/reference/01-diary.md — Step 6 records Pico2W SD-card preparation
+
