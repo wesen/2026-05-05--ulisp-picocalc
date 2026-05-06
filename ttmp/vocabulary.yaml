@@ -5,6 +5,14 @@ topics:
       description: Backend services
     - slug: websocket
       description: WebSocket lifecycle & events
+    - slug: embedded
+      description: Embedded systems and microcontroller firmware
+    - slug: lisp
+      description: Lisp programming language and interpreters
+    - slug: picocalc
+      description: Clockwork Pi PicoCalc handheld computer
+    - slug: rp2040
+      description: Raspberry Pi RP2040 microcontroller
 docTypes:
     - slug: design-doc
       description: Structured rationale and architecture notes

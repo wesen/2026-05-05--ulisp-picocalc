@@ -1,0 +1,3 @@
+### How to Jump Bootloader(UART1) from Application for STM32F103
+
+I am new to STM32F103 and My goal is to Update Firmware using Bootloader. but I do not want to use Hardware way as Pin BOOT0. I want to enter bootloader mode using Backup Register. here is my code ============================ if (BKP->DR1!= 0)...

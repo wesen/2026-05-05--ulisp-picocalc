@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="ulisp-picocalc" CONFIG_NAME="ulisp-picocalc" />
+    </configurations>
+  </component>
+  <component name="CompDBSettings">
+    <option name="linkedExternalProjectsSettings">
+      <CompDBProjectSettings>
+        <option name="buildDirectoryPath" value="$PROJECT_DIR$/build" />
+        <option name="compdbPath" value="$PROJECT_DIR$/build/compile_commands.json" />
+      </CompDBProjectSettings>
+    </option>
+  </component>
+</project>
