@@ -86,3 +86,13 @@ Built primitive sketch and uploaded artifacts to PicoCalc SD card firmware direc
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/repl-window-primitives/repl-window-primitives.ino — Source sketch used for uploaded primitive firmware artifacts
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Recorded SD-card upload step
 
+
+## 2026-05-05
+
+Corrected primitive firmware upload destination to SD-card /pico1-apps; rebuilt and verified PicoCalc_REPL_Primitives.uf2 and REPL_Primitives.bin at /Volumes/NO NAME/pico1-apps.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/repl-window-primitives/repl-window-primitives.ino — Source sketch used for corrected /pico1-apps upload
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Recorded corrected SD-card upload destination
+

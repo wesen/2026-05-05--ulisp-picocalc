@@ -386,3 +386,97 @@ Compile result:
 Sketch uses 78224 bytes (3%) of program storage space. Maximum is 2093056 bytes.
 Global variables use 19888 bytes (7%) of dynamic memory, leaving 242256 bytes for local variables. Maximum is 262144 bytes.
 ```
+
+## Step 4: Correct primitive firmware upload destination to `/pico1-apps`
+
+The SD-card destination was corrected from `/firmware` to `/pico1-apps`. I rebuilt the primitive sketch, created the destination directory if needed, copied both UF2 and BIN artifacts there, and verified the files exist at the corrected location.
+
+This supersedes the earlier upload destination from Step 3. The `/firmware` copies may still exist, but the intended app location for this workflow is now `/pico1-apps`.
+
+### Prompt Context
+
+**User prompt (verbatim):** "it is to /pico1-apps on the SD card now"
+
+**Assistant interpretation:** The firmware artifacts should be uploaded to `/pico1-apps` on the mounted PicoCalc SD card, not `/firmware`.
+
+**Inferred user intent:** Correct the upload destination so the PicoCalc app/firmware selection workflow finds the primitive experiment in the right SD-card folder.
+
+**Commit (code):** N/A — no source changes were made in this step.
+
+### What I did
+
+- Rebuilt the primitive sketch with `arduino-cli compile`.
+- Ensured the remote destination exists:
+
+```bash
+ssh manuel@192.168.0.57 'mkdir -p "/Volumes/NO NAME/pico1-apps"'
+```
+
+- Uploaded the UF2:
+
+```bash
+scp build-repl-window-primitives/repl-window-primitives.ino.uf2 \
+  "manuel@192.168.0.57:/Volumes/NO NAME/pico1-apps/PicoCalc_REPL_Primitives.uf2"
+```
+
+- Uploaded the BIN:
+
+```bash
+scp build-repl-window-primitives/repl-window-primitives.ino.bin \
+  "manuel@192.168.0.57:/Volumes/NO NAME/pico1-apps/REPL_Primitives.bin"
+```
+
+- Verified both files at the corrected location.
+
+### Why
+
+The previous upload placed files under `/firmware`, but the user clarified that the current SD-card app destination is `/pico1-apps`. Keeping firmware in the expected directory avoids confusion during hardware flashing/testing.
+
+### What worked
+
+Remote verification showed:
+
+```text
+/Volumes/NO NAME/pico1-apps/PicoCalc_REPL_Primitives.uf2  190464 bytes
+/Volumes/NO NAME/pico1-apps/REPL_Primitives.bin            95032 bytes
+```
+
+### What didn't work
+
+No upload failure occurred. The compile still emits the expected `TFT_eSPI` touch warning, which is harmless for this sketch.
+
+### What I learned
+
+For this PicoCalc SD-card workflow, primitive app artifacts should go under `/pico1-apps`, not `/firmware`.
+
+### What was tricky to build
+
+As before, the remote volume path contains a space (`/Volumes/NO NAME`), so remote paths must be carefully quoted in `ssh` and `scp` commands.
+
+### What warrants a second pair of eyes
+
+- Whether old copies under `/firmware` should be removed to avoid duplicate/confusing firmware entries.
+- Whether the PicoCalc app loader expects UF2, BIN, or a specific naming convention under `/pico1-apps`.
+
+### What should be done in the future
+
+- Use `/pico1-apps` for subsequent primitive uploads.
+- Flash/test the primitive sketch from the corrected SD-card location.
+
+### Code review instructions
+
+No code changed. Validate the upload with:
+
+```bash
+ssh manuel@192.168.0.57 \
+  'ls -la "/Volumes/NO NAME/pico1-apps/PicoCalc_REPL_Primitives.uf2" "/Volumes/NO NAME/pico1-apps/REPL_Primitives.bin"'
+```
+
+### Technical details
+
+Compile result remained:
+
+```text
+Sketch uses 78224 bytes (3%) of program storage space. Maximum is 2093056 bytes.
+Global variables use 19888 bytes (7%) of dynamic memory, leaving 242256 bytes for local variables. Maximum is 262144 bytes.
+```
