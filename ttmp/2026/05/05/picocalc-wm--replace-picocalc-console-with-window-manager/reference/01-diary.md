@@ -105,3 +105,50 @@ Display (SPI1): SCK=10, MOSI=11, MISO=12, CS=13, DC=14, RST=15
 SD Card (SPI0): SCK=18, MOSI=19, MISO=16, CS=17
 Keyboard (I2C1): SDA=6, SCL=7
 ```
+
+---
+
+### What worked
+
+- Reading the STM32 keyboard firmware (`picocalc_keyboard.ino`) was critical — it revealed the FIFO register protocol, the interrupt capability, and the I2C speed constraint
+- Mapping all pins from `config.h` and `Setup60_RP2040_ILI9488.h` gave a complete picture of available resources
+- The `InterruptDriven.ino` example proves GPIO-interrupt keyboard reading is supported by the library
+
+### What didn't work
+
+- No failures in this analysis step
+
+### What I learned
+
+- The console is entirely character-based with a scroll buffer — no framebuffer compositing
+- Core 1 is completely unused — perfect for a WM compositor
+- The keyboard I2C at 10kHz is the main bottleneck (~4ms per key read)
+- The STM32 keyboard MCU supports interrupt-driven reading but uLisp doesn't use it
+- `testescape()` uses `longjmp` for abort — this is dangerous in a multi-window context
+- Graphics functions bypass the scroll buffer entirely — they write directly to the display
+
+### What was tricky to build
+
+- Tracing the data flow through multiple indirection layers: `pserial → Display → PlotChar → tft.drawChar` with scroll buffer circular indexing `(line+Scroll) % Lines`
+
+### What warrants a second pair of eyes
+
+- The dual-core FIFO architecture proposal — ensuring no deadlocks between Core 0 (Lisp) and Core 1 (WM)
+- The memory budget for virtual console buffers (14KB for 4 windows with color attributes)
+
+### What should be done in the future
+
+- Write the window manager design document (what to build)
+- Prototype Core 1 FIFO communication
+- Benchmark SPI partial redraw performance for window-sized regions
+- Test GPIO interrupt latency for keyboard events
+
+### Commit
+
+Code: 8355693 — "Create picocalc-wm ticket with diary and tasks"
+
+### Code review instructions
+
+- Read `design/01-console-architecture.md` sections 2-3 (display and keyboard pipelines)
+- Cross-reference against `ulisp-picocalc.ino` lines 7211-7580
+- Verify the pin map in section 5 against `config.h` and `Setup60_RP2040_ILI9488.h`
