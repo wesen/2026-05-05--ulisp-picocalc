@@ -37,3 +37,13 @@ Step 4: Diagnosed stock PicoCalc bootloader v1.0 BIN issue, added uf2loader subm
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/picocalc-wm--replace-picocalc-console-with-window-manager/design/03-picocalc-bootloader-analysis.md — Bootloader analysis and flashing instructions
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/uf2loader — UF2 Loader source submodule
 
+
+## 2026-05-05
+
+Step 5: Wrote Obsidian ARTICLE deep dive on UF2 Loader two-stage architecture, copied it into the ticket with cp, and recorded compile/install/runtime details.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/picocalc-wm--replace-picocalc-console-with-window-manager/reference/05-picocalc-uf2loader-two-stage-deep-dive.md — Ticket copy of vault report
+- /home/manuel/code/wesen/obsidian-vault/Projects/2026/05/05/ARTICLE - PicoCalc UF2 Loader - Two-Stage Bootloader Deep Dive.md — Vault report
+

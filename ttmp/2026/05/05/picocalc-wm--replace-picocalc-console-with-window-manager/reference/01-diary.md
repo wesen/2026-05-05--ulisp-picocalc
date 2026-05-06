@@ -350,3 +350,84 @@ How to flash the bootloader itself:
 2. Copy `bootloader_pico.uf2` to the `RPI-RP2` USB mass-storage drive.
 3. Reboot with the SD card inserted.
 4. Hold Up/F1/F5 at power-on to enter the UF2 Loader menu.
+
+---
+
+## Step 5: Write UF2 Loader deep-dive report for Obsidian and ticket
+
+I wrote a long-form technical report explaining the PicoCalc UF2 Loader architecture in textbook style, with concrete source references and no analogies. The report covers the old stock Bootloader v1.0 workflow, the UF2 Loader two-step design, the flashed stage3 bootloader, the SD-card menu UI, the UF2 parsing/flash programming path, compilation requirements, and the practical uLisp development workflow.
+
+The report was written first into the Obsidian vault as an `ARTICLE - ...` note, then copied into the docmgr ticket with `cp`, as requested. This creates one durable knowledge note in the vault and one ticket-local copy that travels with the investigation artifacts.
+
+### Prompt Context
+
+**User prompt (verbatim):** "ok, write a detailed diary and then a project report for our obsidian vault on how to compile uf2 bootloader and how it works in detail, in a deep dive technical blog post style, in a textbook writing style (see skills, no analogies). When done, use `cp` to copy inside the ticket. I want to know how this whole bootloader in 2 steps works, how the menu on the SD card works, all of it."
+
+**Assistant interpretation:** Write a detailed diary entry and then produce a deep technical Obsidian article explaining UF2 Loader's compile/install/runtime architecture, especially the two-step bootloader/menu split and SD-card menu flow. Copy the finished Obsidian report into the ticket with `cp`.
+
+**Inferred user intent:** Preserve the bootloader investigation as durable knowledge, not just a chat answer, so future development can proceed without rediscovering the legacy multibooter/UF2 Loader distinction.
+
+### What I did
+
+- Read the Obsidian vault writing skill and used an `ARTICLE - ...` note shape.
+- Re-read `uf2loader/README.md`, `stage3/stage3.c`, `stage3/uf2.c`, `stage3/memmap_2040.ld`, `ui/main.c`, `ui/uf2.c`, and `common/bootloader/proginfo.c`.
+- Re-read the ClockworkPi stock multibooter source at `PicoCalc/Code/pico_multi_booter/sd_boot/main.c` and its linker script at `PicoCalc/Code/pico_multi_booter/linker_scripts/memmap_default.ld.mp.rp2040`.
+- Wrote the Obsidian note:
+  - `/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/05/ARTICLE - PicoCalc UF2 Loader - Two-Stage Bootloader Deep Dive.md`
+- Copied it into the ticket using `cp`:
+  - `ttmp/2026/05/05/picocalc-wm--replace-picocalc-console-with-window-manager/reference/05-picocalc-uf2loader-two-stage-deep-dive.md`
+- Verified both copies have the same size and line count: 25,535 bytes, 767 lines.
+
+### What worked
+
+- The source split is clear once read directly:
+  - `stage3/` is the small flashed bootloader path.
+  - `ui/` is the SD-card menu path loaded from `BOOT2040.UF2`.
+  - `common/bootloader/proginfo.c` is the metadata bridge between them.
+- The local report now explains exactly why legacy `.bin` files failed and why UF2 Loader solves the problem for normal Arduino uLisp UF2 builds.
+- `cp` was used explicitly to copy the Obsidian note into the ticket, preserving the requested workflow.
+
+### What didn't work
+
+- The local source build of UF2 Loader is still not fully solved because the available Pico SDK/TinyUSB combination does not match the API expected by the UF2 Loader UI USB mass-storage code. The build error remains:
+
+```text
+ui/lib/usb_msc/usb_msc.c:23:3: error: unknown type name 'tusb_rhport_init_t'
+ui/lib/usb_msc/usb_msc.c:25:3: error: too many arguments to function 'tusb_init'
+```
+
+- The official release artifacts remain the recommended bootloader/menu files until the SDK/TinyUSB version mismatch is resolved.
+
+### What I learned
+
+- UF2 Loader's menu is not compiled into the flashed bootloader. It is a separate UF2 (`BOOT2040.UF2`) loaded from SD into SRAM.
+- Stage3 loads `BOOT2040.UF2` only when Up/F1/F5 is held or when a command asks it to load a RAM app.
+- The menu UI is responsible for flashing selected app UF2s into the persistent application flash area.
+- Proginfo stored in the vector-table hole is what lets the bootloader know an app is installed and how much flash is safe.
+
+### What was tricky to build
+
+- The phrase "bootloader" refers to multiple binaries: the flashed `bootloader_pico.uf2`, the SD-card `BOOT2040.UF2` menu, and the old stock v1.0 multibooter. The report avoids ambiguity by naming each binary and its location.
+- The RP2040 boot vector location differs depending on context. Normal apps have boot2 at flash offset 0 and vectors at `XIP_BASE + 0x100`; legacy stock `.bin` apps must begin directly with vectors at `0x10032000`; UF2 Loader preserves its own boot2 and launches apps through the vector table at `XIP_BASE + 0x100`.
+
+### What warrants a second pair of eyes
+
+- The section about app flash safety should be reviewed once uLisp's save-image/LittleFS behavior is tested under UF2 Loader. uLisp may need to respect the bootloader's protected high-flash area.
+- The compile instructions should be revised if we install the exact Pico SDK 2.2.0 / TinyUSB API expected by UF2 Loader and get a clean source build of `BOOT2040.UF2`.
+
+### What should be done in the future
+
+- Flash official `bootloader_pico.uf2` via BOOTSEL and verify the menu appears.
+- Select the uLisp UF2 from `/pico1-apps/` and verify it boots.
+- Test uLisp flash-writing features under UF2 Loader.
+- Optionally fix the local UF2 Loader source build by installing the matching Pico SDK/TinyUSB toolchain.
+
+### Code review instructions
+
+- Start with the vault article or its ticket copy:
+  - `/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/05/ARTICLE - PicoCalc UF2 Loader - Two-Stage Bootloader Deep Dive.md`
+  - `ttmp/2026/05/05/picocalc-wm--replace-picocalc-console-with-window-manager/reference/05-picocalc-uf2loader-two-stage-deep-dive.md`
+- Cross-check stage3 behavior in `uf2loader/stage3/stage3.c`.
+- Cross-check app flashing in `uf2loader/ui/uf2.c`.
+- Cross-check proginfo storage in `uf2loader/common/bootloader/proginfo.c`.
+- Cross-check legacy stock bootloader expectations in `PicoCalc/Code/pico_multi_booter/sd_boot/main.c`.
