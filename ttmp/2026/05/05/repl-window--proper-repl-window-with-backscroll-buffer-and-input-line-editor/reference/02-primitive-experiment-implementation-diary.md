@@ -196,7 +196,7 @@ This step is useful because the back buffer and renderer need to handle output b
 
 **Inferred user intent:** Build confidence in the primitive UI model through small, reviewable steps before uLisp integration.
 
-**Commit (code):** pending — will be recorded after this step is committed.
+**Commit (code):** f9ae1f2028ff8dda3b8f1036dbd1573ada5f55c2 — "Add primitive fake evaluator commands"
 
 ### What I did
 

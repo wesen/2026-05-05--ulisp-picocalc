@@ -67,3 +67,12 @@ Primitive sketch Step 2: added fake evaluator commands (/help, /spam, /clear, /s
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Recorded Step 2
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/03-primitive-picocalc-experiment-implementation-guide.md — Documented fake evaluator commands
 
+
+## 2026-05-05
+
+Recorded primitive Step 2 implementation commit f9ae1f2028ff8dda3b8f1036dbd1573ada5f55c2 in the diary.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Diary updated with Step 2 commit hash
+
