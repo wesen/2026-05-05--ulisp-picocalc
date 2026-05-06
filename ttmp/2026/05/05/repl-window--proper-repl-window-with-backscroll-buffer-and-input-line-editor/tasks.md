@@ -138,3 +138,17 @@
 - [ ] Compare primitive sketch behavior against existing uLisp `Display()`, `ProcessKey()`, `gserial()`, and `pserial()` contracts.
 - [ ] Decide which primitive code can be copied directly and which must be adapted for uLisp flags such as `NOECHO`, `ESCAPE`, and break-level prompts.
 - [ ] Update the intern guide with hardware findings from the primitive sketch.
+
+### Primitive Milestone P5 — Colors, bold, icons, and graphics
+
+- [x] Add 16-color neon/neotokyo palette.
+- [x] Add per-cell fg/bg color attributes via packed byte in back buffer.
+- [x] Add bold rendering via double-draw offset.
+- [x] Add simple icon drawing (heart, star, check, cross, arrows).
+- [x] Add TFT graphics commands: line, rect, fill-rect, circle, fill-circle.
+- [x] Add `/demo` command that exercises colors, bold, and graphics.
+- [x] Add `/fg`, `/bg`, `/bold`, `/normal`, `/palette`, `/clear-gfx` commands.
+- [x] Add `/icon name x y col` command.
+- [ ] Test `/demo` on hardware and verify all 16 colors, bold text, and graphics overlay.
+- [ ] Test `/clear-gfx` removes graphics overlay without corrupting text.
+

@@ -107,3 +107,14 @@ Implemented lightweight char+attribute dirty-cell renderer after hardware flicke
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/design/03-dirty-cell-renderer-design-and-implementation-guide.md — Design and implementation guide for dirty-cell rendering
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Recorded dirty-cell renderer step
 
+
+## 2026-05-05
+
+Step 6: Clean rewrite of primitive sketch adding 16-color palette, per-cell fg/bg attributes, bold rendering, icons, TFT graphics commands with replay buffer, /demo command. Compiles cleanly at 86816B flash / 47480B RAM. Uploaded to /pico1-apps.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/repl-window-primitives/repl-window-primitives.ino — Clean rewrite with palette
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/design/04-color-control-codes-bold-and-tft-graphics-primitives.md — Design doc for color/graphics primitives
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Recorded Step 6
+
