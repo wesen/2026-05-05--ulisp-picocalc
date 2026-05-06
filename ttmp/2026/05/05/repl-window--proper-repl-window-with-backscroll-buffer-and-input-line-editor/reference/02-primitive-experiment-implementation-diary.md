@@ -48,7 +48,7 @@ Create a separate design and implementation document, add tasks, and upload the 
 
 **Inferred user intent:** De-risk the eventual uLisp REPL window by validating low-level PicoCalc UI primitives in isolation before modifying the interpreter.
 
-**Commit (code):** pending — first commit will include the initial sketch and docs after task/doc updates and reMarkable upload.
+**Commit (code):** c46ef29c3d3f41772148d1aa670fb78e208f270c — "Add PicoCalc REPL primitive sketch"
 
 ### What I did
 

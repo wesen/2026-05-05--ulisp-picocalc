@@ -47,3 +47,12 @@ Created standalone C++ primitive PicoCalc sketch for TFT/keyboard experiments, a
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Diary Step 1 recording initial primitive sketch work
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/03-primitive-picocalc-experiment-implementation-guide.md — Implementation guide for future primitive work
 
+
+## 2026-05-05
+
+Recorded initial primitive sketch implementation commit c46ef29c3d3f41772148d1aa670fb78e208f270c in the implementation diary.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Diary updated with initial implementation commit hash
+
