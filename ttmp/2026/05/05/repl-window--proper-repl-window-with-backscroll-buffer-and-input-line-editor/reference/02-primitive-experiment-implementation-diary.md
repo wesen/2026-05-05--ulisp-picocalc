@@ -278,3 +278,111 @@ Compile result:
 Sketch uses 78224 bytes (3%) of program storage space. Maximum is 2093056 bytes.
 Global variables use 19888 bytes (7%) of dynamic memory, leaving 242256 bytes for local variables. Maximum is 262144 bytes.
 ```
+
+## Step 3: Build and upload primitive firmware artifacts to the PicoCalc SD card
+
+I rebuilt the standalone primitive sketch and copied both generated firmware artifacts to the PicoCalc SD card's firmware directory over SSH/SCP. This makes the primitive experiment available for hardware flashing/testing without touching the uLisp firmware image names.
+
+The uploaded files use explicit primitive-experiment names so they do not overwrite the main uLisp firmware artifacts.
+
+### Prompt Context
+
+**User prompt (verbatim):** "upload to SD card"
+
+**Assistant interpretation:** Build the current primitive sketch and upload its UF2/BIN outputs to the PicoCalc SD-card firmware folder.
+
+**Inferred user intent:** Put the primitive experiment firmware onto the SD card so it can be flashed/tested on the PicoCalc hardware.
+
+**Commit (code):** N/A — no source changes were made in this step.
+
+### What I did
+
+- Rebuilt the primitive sketch with:
+
+```bash
+arduino-cli compile \
+  --fqbn rp2040:rp2040:rpipico \
+  --build-path build-repl-window-primitives \
+  --warnings all \
+  repl-window-primitives
+```
+
+- Confirmed local artifacts:
+
+```text
+build-repl-window-primitives/repl-window-primitives.ino.uf2
+build-repl-window-primitives/repl-window-primitives.ino.bin
+```
+
+- Uploaded to the remote SD card firmware directory:
+
+```bash
+scp build-repl-window-primitives/repl-window-primitives.ino.uf2 \
+  "manuel@192.168.0.57:/Volumes/NO NAME/firmware/PicoCalc_REPL_Primitives.uf2"
+
+scp build-repl-window-primitives/repl-window-primitives.ino.bin \
+  "manuel@192.168.0.57:/Volumes/NO NAME/firmware/REPL_Primitives.bin"
+```
+
+- Verified remote files with:
+
+```bash
+ssh manuel@192.168.0.57 \
+  'ls -la "/Volumes/NO NAME/firmware/PicoCalc_REPL_Primitives.uf2" "/Volumes/NO NAME/firmware/REPL_Primitives.bin"'
+```
+
+### Why
+
+The next useful work is hardware testing: confirm the display, keyboard, cursor, edit buffer, and fake evaluator behavior on the actual PicoCalc. Uploading the artifacts to the SD card makes that possible.
+
+### What worked
+
+- Compile succeeded.
+- SCP upload succeeded.
+- Remote verification showed both files present:
+
+```text
+/Volumes/NO NAME/firmware/PicoCalc_REPL_Primitives.uf2  190464 bytes
+/Volumes/NO NAME/firmware/REPL_Primitives.bin            95032 bytes
+```
+
+### What didn't work
+
+- No upload failure occurred.
+- The compile still emits the expected `TFT_eSPI` warning about `TOUCH_CS` not being defined. This is not relevant because the sketch does not use touch.
+
+### What I learned
+
+Keeping the primitive artifact names distinct avoids overwriting the main uLisp firmware names used by the Makefile (`PicoCalc_uLisp_4.8f.uf2`, `uLisp_4.8f.bin`).
+
+### What was tricky to build
+
+The SD volume path contains a space: `/Volumes/NO NAME`. All `scp` and `ssh ls` commands need quoting around the remote path to avoid splitting the volume name.
+
+### What warrants a second pair of eyes
+
+- Confirm on the PicoCalc side which artifact the flashing workflow expects: UF2, BIN, or both.
+- Confirm whether the filenames should be shortened for any on-device firmware selection UI.
+
+### What should be done in the future
+
+- Flash `PicoCalc_REPL_Primitives.uf2` or `REPL_Primitives.bin` using the PicoCalc workflow.
+- Record actual hardware behavior and special key codes in the next diary step.
+
+### Code review instructions
+
+No code changed. Validate by checking the remote SD-card files exist:
+
+```bash
+ssh manuel@192.168.0.57 \
+  'ls -la "/Volumes/NO NAME/firmware/PicoCalc_REPL_Primitives.uf2" "/Volumes/NO NAME/firmware/REPL_Primitives.bin"'
+```
+
+### Technical details
+
+Compile result:
+
+```text
+Sketch uses 78224 bytes (3%) of program storage space. Maximum is 2093056 bytes.
+Global variables use 19888 bytes (7%) of dynamic memory, leaving 242256 bytes for local variables. Maximum is 262144 bytes.
+```

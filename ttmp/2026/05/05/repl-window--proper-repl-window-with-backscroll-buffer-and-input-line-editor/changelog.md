@@ -76,3 +76,13 @@ Recorded primitive Step 2 implementation commit f9ae1f2028ff8dda3b8f1036dbd1573a
 
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Diary updated with Step 2 commit hash
 
+
+## 2026-05-05
+
+Built primitive sketch and uploaded artifacts to PicoCalc SD card firmware directory as PicoCalc_REPL_Primitives.uf2 and REPL_Primitives.bin; verified remote files exist.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/repl-window-primitives/repl-window-primitives.ino — Source sketch used for uploaded primitive firmware artifacts
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Recorded SD-card upload step
+
