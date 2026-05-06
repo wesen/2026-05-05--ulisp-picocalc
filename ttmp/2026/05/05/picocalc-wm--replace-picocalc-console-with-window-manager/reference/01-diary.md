@@ -152,3 +152,37 @@ Code: 8355693 — "Create picocalc-wm ticket with diary and tasks"
 - Read `design/01-console-architecture.md` sections 2-3 (display and keyboard pipelines)
 - Cross-reference against `ulisp-picocalc.ino` lines 7211-7580
 - Verify the pin map in section 5 against `config.h` and `Setup60_RP2040_ILI9488.h`
+
+---
+
+## Step 2: Write Literate Console Walkthrough
+
+Wrote a 10-chapter literate programming document that reads the PicoCalc console source code like a textbook, following the Peter Norvig style from the textbook-authoring skill.
+
+### Prompt Context
+
+**User prompt (verbatim):** "Make a longform textbook writing style literate programming document for all of that functionality, so that I can read the real code as I go. (see skill for textbook writing style). Store in ticket, upload to remarkable."
+
+**Assistant interpretation:** Create a comprehensive literate programming document that walks through the actual source code of the console system, with verbatim code listings woven into explanatory prose, following the Peter Norvig style (foundational first, concrete examples, rhythm breaks, no AI slop).
+
+**Inferred user intent:** A readable document that serves as both an educational guide and a reference, allowing the reader to understand the code deeply enough to design and implement a window manager.
+
+### What I did
+
+- Read the textbook-authoring SKILL.md for style guidelines
+- Re-read key source sections to quote code verbatim with line numbers
+- Wrote the document in 12 small append chunks (following the "small writes" instruction)
+- 10 chapters covering: boot sequence, main loop, display pipeline, keyboard pipeline, escape handling, bus topology, dual-core architecture, graphics, sound, and window manager requirements
+- Relate 6 source files, uploaded to reMarkable
+
+### What worked
+
+- The Peter Norvig style — opening each chapter with purpose and motivation before showing code
+- Quoting actual code with line numbers makes the document traceable to the source
+- The "hard problems" section at the end surfaces the real design challenges
+
+### What should be done in the future
+
+- Design the actual window manager architecture (what to build)
+- Prototype Core 1 FIFO communication
+- Implement virtual console data structure
