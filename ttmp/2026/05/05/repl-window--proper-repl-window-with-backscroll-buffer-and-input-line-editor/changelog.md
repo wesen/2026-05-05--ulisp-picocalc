@@ -150,3 +150,24 @@ Committed integrated REPL-window firmware changes in nested ulisp-picocalc repo 
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/04-integration-implementation-diary.md — Updated with nested commit hash
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ulisp-picocalc — Nested firmware repo commit with REPL-window header integration
 
+
+## 2026-05-06
+
+Integration Step 3: styled prompt/input/output separately, removed duplicate > from committed input, removed extra final newline, compiled and uploaded updated integrated firmware to /pico1-apps.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/04-integration-implementation-diary.md — Recorded style and spacing fix
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ulisp-picocalc/repl_window.h — Added style helpers and changed ReplEditCommit to append input without an extra prompt
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ulisp-picocalc/ulisp-picocalc.ino — Styled prompt/output in repl and removed extra final newline
+
+
+## 2026-05-06
+
+Committed REPL transcript color/spacing fix in nested firmware repo as ddc137c17a56813456d4941203f013fe8fd2fbf3.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/04-integration-implementation-diary.md — Updated with nested commit hash
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ulisp-picocalc — Nested firmware repo commit with prompt/input/output style changes
+

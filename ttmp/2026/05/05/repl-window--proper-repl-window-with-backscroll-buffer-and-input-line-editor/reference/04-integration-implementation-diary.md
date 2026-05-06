@@ -293,3 +293,93 @@ Uploaded artifacts:
 build-ulisp-integrate/ulisp-picocalc.ino.uf2 → /pico1-apps/PicoCalc_uLisp_REPL_Window.uf2
 build-ulisp-integrate/ulisp-picocalc.ino.bin → /pico1-apps/uLisp_REPL_Window.bin
 ```
+
+## Step 3: Color-separate prompt/input/output and remove duplicate prompt/blank line
+
+The backlog made the transcript separation harder to read and exposed two formatting issues: committed input lines effectively duplicated the prompt (`> > ...`) because both `repl()` and `ReplEditCommit()` wrote a prompt, and the REPL printed an extra blank line after each result because it called both `pfl(pserial)` and `pln(pserial)` at the end of each loop.
+
+I changed the REPL window styling so prompt, input, and output have separate colors, then removed the extra prompt write from `ReplEditCommit()` and removed the final unconditional `pln(pserial)` from `repl()`.
+
+### Prompt Context
+
+**User prompt (verbatim):** "Commit first if you haven't. color the input / vs output strings differently in the backlog. Also, not 2 new lines, and not > > ... on the input lines. The color will help the separation well enough."
+
+**Assistant interpretation:** Ensure the previous work is committed, then adjust transcript rendering so prompt/input/output are visually distinct, committed input does not duplicate the prompt, and results do not leave an extra blank line.
+
+**Inferred user intent:** Make the integrated REPL transcript usable/readable on hardware without relying on redundant prompts or extra whitespace.
+
+**Commit (code):** ddc137c17a56813456d4941203f013fe8fd2fbf3 — "Colorize REPL transcript roles"
+
+### What I did
+
+- Confirmed the previous integration work was already committed and the tracked integration files were clean.
+- Added style helpers in `repl_window.h`:
+  - `ReplSetOutputStyle()` — soft white on black,
+  - `ReplSetPromptStyle()` — bold neon cyan on black,
+  - `ReplSetInputStyle()` — neon green on black,
+  - `ReplSetErrorStyle()` — reserved neon pink bold style.
+- Changed `ReplEditCommit()` so it no longer appends `> `; it appends only the committed input text in input color, then a newline.
+- Changed `repl()` so it sets prompt style around the prompt and output style before printing evaluation results.
+- Removed the final unconditional `pln(pserial)` after `pfl(pserial)` so each result does not create an extra blank line.
+- Compiled and uploaded the updated integrated firmware to `/pico1-apps`.
+
+### Why
+
+The prompt is already emitted by the uLisp REPL loop before `readmain(gserial)`. The edit buffer commit should complete that same transcript line, not start a second prompt. Color separation now makes transcript roles clear without adding extra `>` markers or blank lines.
+
+### What worked
+
+Compile succeeded:
+
+```text
+Sketch uses 200388 bytes (9%) of program storage space. Maximum is 2093056 bytes.
+Global variables use 187760 bytes (71%) of dynamic memory, leaving 74384 bytes for local variables. Maximum is 262144 bytes.
+```
+
+Uploaded and verified:
+
+```text
+/Volumes/NO NAME/pico1-apps/PicoCalc_uLisp_REPL_Window.uf2  438272 bytes
+/Volumes/NO NAME/pico1-apps/uLisp_REPL_Window.bin            219064 bytes
+```
+
+### What didn't work
+
+No compile or upload failures occurred. Hardware validation is still pending.
+
+### What I learned
+
+The transcript should be treated as one logical line spanning prompt + committed input. The REPL loop owns the prompt, while the edit buffer commit owns only the input suffix.
+
+### What was tricky to build
+
+The tricky part is the ordering: `repl()` prints the prompt before `readmain(gserial)`, while `ReplEditCommit()` runs inside `gserial()` while the reader is waiting. That means prompt and input are emitted from different layers but should form one visual line.
+
+### What warrants a second pair of eyes
+
+- Whether output printed by evaluated Lisp code before the final result should remain output-colored or needs temporary style changes.
+- Whether errors should call `ReplSetErrorStyle()` in the error-reporting path.
+
+### What should be done in the future
+
+- Hardware-test the transcript for prompt/input/result spacing.
+- Add error-color styling in `errorsub()` or the central error print path.
+
+### Code review instructions
+
+Review:
+
+```text
+ulisp-picocalc/repl_window.h
+ulisp-picocalc/ulisp-picocalc.ino
+```
+
+Key symbols:
+
+```text
+ReplSetPromptStyle
+ReplSetInputStyle
+ReplSetOutputStyle
+ReplEditCommit
+repl
+```
