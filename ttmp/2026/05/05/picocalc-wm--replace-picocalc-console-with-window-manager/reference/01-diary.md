@@ -239,3 +239,114 @@ Output: 211,448 bytes code (10% flash), 193,800 bytes global vars (73% RAM)
 Warnings: longjmp clobbering (expected), no touch CS (expected — no touchscreen)
 Upload: scp → manuel@192.168.0.57:/Volumes/NO NAME/firmware/PicoCalc_uLisp_4.8f_wm.uf2
 ```
+
+---
+
+## Step 4: Investigate stock bootloader BIN failure and install UF2 Loader menu
+
+The uLisp BIN files copied into `/firmware` did not boot because they were normal UF2 payloads converted to BIN, not legacy PicoCalc multibooter applications. The stock PicoCalc bootloader v1.0 expects `.bin` files that begin with a valid RP2040 vector table and whose reset vectors point into the bootloader app region at `0x10032000`.
+
+Rather than continue fighting the legacy BIN linker path, I installed the newer UF2 Loader menu assets onto the SD card. This lets us keep compiling ordinary Arduino/Pico `.uf2` files for uLisp and place them under `pico1-apps/`, avoiding custom linker scripts during development.
+
+### Prompt Context
+
+**User prompt (verbatim):** "Your little brother has been trying to get the ulisp to boot from the picocalc sd card, but has been struggling. Assess what they did up to know, write a detailed diary entry, then fix it"
+
+**Assistant interpretation:** Review the prior compile/upload/UF2-to-BIN attempts, explain why they failed with the stock PicoCalc bootloader, preserve scripts/sources, and move to a reliable boot path.
+
+**Inferred user intent:** Get uLisp booting from the PicoCalc SD card reliably while preserving enough evidence to understand and reproduce the process later.
+
+### What I did
+
+- Searched and downloaded forum/source references into the ticket `sources/` directory using Defuddle.
+- Added `pelrun/uf2loader` as a git submodule and checked it out at release tag `v2.4.1`.
+- Read `uf2loader/README.md`, `ui/main.c`, `stage3/stage3.c`, and `stage3/uf2.c`.
+- Read the ClockworkPi `pico_multi_booter` source already vendored under `PicoCalc/Code/pico_multi_booter/sd_boot/main.c`.
+- Verified headers of known-good stock `.bin` files from `/firmware` on the SD card:
+  - Stock app BINs begin with a vector table: stack pointer `0x20042000`, reset vector around `0x100320xx`.
+  - Our converted uLisp BINs begin with boot2 instruction bytes like `0x4b32b500`, not a vector table.
+- Saved all helper scripts into the ticket `scripts/` directory.
+- Installed official UF2 Loader release assets to the SD card:
+  - `/BOOT2040.UF2`
+  - `/pico1-apps/uLisp_4.8f_arduino_pico_4.5.0.uf2`
+  - `/firmware/uf2loader_bootloader_pico_v2.4.1.uf2`
+  - `/firmware/uf2loader_diag_pico_v2.4.1.uf2`
+- Synced and unmounted the SD card cleanly.
+
+### What worked
+
+- The Defuddle captures gave a clear external confirmation: legacy PicoCalc bootloader apps require custom linker files, while UF2 Loader supersedes that workflow and accepts ordinary UF2s.
+- The ClockworkPi source confirmed `SD_BOOT_FLASH_OFFSET = 200 * 1024` and vector-table validation in the loaded app flash region.
+- Official UF2 Loader release artifacts were easy to install on the SD card and are safer than locally-built bootloader artifacts for flashing.
+
+### What didn't work
+
+- Normal `.uf2 -> .bin` extraction does not create a valid legacy multibooter app. It extracts the raw UF2 payload starting with boot2, not an offset-linked vector-table application image.
+- An attempted Arduino-Pico multiboot linker build initially produced a `.bin` that was still wrong because the Arduino image begins with `.boot2` and `.ota` before `.text`; the stock bootloader wants `.vectors` first.
+- Building UF2 Loader from source with the local Pico SDK got as far as `bootloader_pico.uf2` and `diag_pico.uf2`, but the UI (`BOOT2040.UF2`) failed against the local SDK/TinyUSB version:
+
+```text
+ui/lib/usb_msc/usb_msc.c:23:3: error: unknown type name 'tusb_rhport_init_t'
+ui/lib/usb_msc/usb_msc.c:25:3: error: too many arguments to function 'tusb_init'
+```
+
+This indicates the checked-out SDK/TinyUSB API is older than the UF2 Loader source expects. The official release assets avoid this toolchain mismatch.
+
+### What I learned
+
+- Stock PicoCalc Bootloader v1.0 and UF2 Loader are different systems with different app formats.
+- For stock v1.0, `.bin` means: linked at `0x10032000`, first bytes are the vector table, no boot2 prefix.
+- For UF2 Loader, ordinary `.uf2` files are the intended app format; the menu UI itself lives in `BOOT2040.UF2` on the SD root.
+- UF2 Loader displays a menu on the PicoCalc LCD, but only when the flashed bootloader is installed and `BOOT2040.UF2` is present on the SD card.
+
+### What was tricky to build
+
+- The confusing part was that `.bin` can mean two different things: Arduino's raw flash binary starts at `0x10000000` and includes boot2, while the legacy multibooter `.bin` starts at the app vector table and is linked for `0x10032000`.
+- The Arduino-Pico build system generates its linker script through `simplesub.py`, so overriding the linker script requires replacing the prelink recipe or using a modified platform. Simply passing another `--script` adds a second linker script and fails.
+
+### What warrants a second pair of eyes
+
+- Flashing a bootloader always carries risk. Use the official UF2 Loader release artifact (`bootloader_pico.uf2`) rather than the local source build until the Pico SDK/TinyUSB mismatch is solved.
+- Verify that the PicoCalc has a Pico/RP2040, not Pico 2/RP2350. For Pico/RP2040 use `bootloader_pico.uf2` and `BOOT2040.UF2`; for Pico 2 use `bootloader_pico2.uf2` and `BOOT2350.UF2`.
+
+### What should be done in the future
+
+- Flash `uf2loader_bootloader_pico_v2.4.1.uf2` via BOOTSEL.
+- Boot with the prepared SD card inserted and hold Up/F1/F5 to verify the UF2 Loader menu appears.
+- Select `uLisp_4.8f_arduino_pico_4.5.0.uf2` from `pico1-apps/` and confirm uLisp boots.
+- If we later need stock v1.0 compatibility, build a proper vector-table-first `0x10032000` BIN using ClockworkPi's exact linker script and an Arduino-Pico platform recipe override.
+
+### Code review instructions
+
+- Read `design/03-picocalc-bootloader-analysis.md` for the concise explanation.
+- Read `sources/09-solved-app-running-from-bootloader-v1.md` for external confirmation of the stock bootloader linker issue.
+- Read `uf2loader/README.md` for installation and usage instructions.
+- Inspect known-good stock BIN headers with:
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+import struct
+for p in Path('/Volumes/NO NAME/firmware').glob('*.bin'):
+    b = p.read_bytes()[:16]
+    print(p.name, ' '.join(hex(x) for x in struct.unpack('<4I', b)))
+PY
+```
+
+### Technical details
+
+Installed to SD card:
+
+```text
+/BOOT2040.UF2
+/pico1-apps/uLisp_4.8f_arduino_pico_4.5.0.uf2
+/firmware/uf2loader_bootloader_pico_v2.4.1.uf2
+/firmware/uf2loader_diag_pico_v2.4.1.uf2
+```
+
+How to flash the bootloader itself:
+
+1. Enter RP2040 BOOTSEL mode.
+2. Copy `bootloader_pico.uf2` to the `RPI-RP2` USB mass-storage drive.
+3. Reboot with the SD card inserted.
+4. Hold Up/F1/F5 at power-on to enter the UF2 Loader menu.

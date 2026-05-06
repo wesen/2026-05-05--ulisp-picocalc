@@ -27,3 +27,13 @@ Step 2: Wrote 10-chapter literate console walkthrough in Peter Norvig textbook s
 
 Step 3: Compiled uLisp (460KB uf2) and uploaded to PicoCalc SD card at /Volumes/NO NAME/firmware/PicoCalc_uLisp_4.8f_wm.uf2
 
+
+## 2026-05-05
+
+Step 4: Diagnosed stock PicoCalc bootloader v1.0 BIN issue, added uf2loader submodule, installed UF2 Loader menu assets to SD card, documented flashing instructions.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/picocalc-wm--replace-picocalc-console-with-window-manager/design/03-picocalc-bootloader-analysis.md — Bootloader analysis and flashing instructions
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/uf2loader — UF2 Loader source submodule
+

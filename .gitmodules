@@ -10,3 +10,6 @@
 [submodule "arduino_picocalc_kbd"]
 	path = arduino_picocalc_kbd
 	url = https://github.com/cuu/arduino_picocalc_kbd.git
+[submodule "uf2loader"]
+	path = uf2loader
+	url = https://github.com/pelrun/uf2loader.git
