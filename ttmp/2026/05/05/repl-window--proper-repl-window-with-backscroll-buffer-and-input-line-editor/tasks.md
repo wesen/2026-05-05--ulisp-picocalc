@@ -113,8 +113,8 @@
 - [x] Implement physical-row transcript/back buffer.
 - [x] Implement append, newline, wrap, and tail-follow behavior.
 - [x] Implement full-screen renderer with transcript, status row, and input area.
-- [ ] Test full-screen redraw on hardware for flicker/performance.
-- [ ] Add dirty-row rendering if full redraw is too slow or flickery.
+- [x] Test full-screen redraw on hardware for flicker/performance; user reported screen flicker while other behavior seemed OK.
+- [x] Add lightweight dirty-cell rendering to avoid full row/screen clears after flicker report.
 
 ### Primitive Milestone P2 — Keyboard and edit buffer
 

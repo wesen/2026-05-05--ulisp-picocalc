@@ -480,3 +480,135 @@ Compile result remained:
 Sketch uses 78224 bytes (3%) of program storage space. Maximum is 2093056 bytes.
 Global variables use 19888 bytes (7%) of dynamic memory, leaving 242256 bytes for local variables. Maximum is 262144 bytes.
 ```
+
+## Step 5: Replace full-row redraws with a lightweight dirty-cell renderer
+
+The hardware test reported that the primitive sketch's behavior was otherwise OK, but the screen flickered. The cause is that the renderer was still clearing and redrawing rows directly on the TFT. Because the TFT is updated over SPI without an application-level framebuffer swap, those clears are visible.
+
+I replaced the renderer with a lightweight character-cell diff model. It composes a desired text-cell screen from the transcript/status/input state, compares it against the last drawn text-cell screen, and sends only changed cells to the TFT. This avoids full-row clears and is much closer to the renderer we should eventually port into uLisp.
+
+### Prompt Context
+
+**User prompt (verbatim):** "continue. Create a design + implementation guide (doesn't need to be super long, but still has all the details), and then implement."
+
+**Assistant interpretation:** Document the dirty-cell renderer approach and implement it in the primitive sketch.
+
+**Inferred user intent:** Convert the flickering primitive renderer into a RAM-conscious text-cell diff renderer that can inform the uLisp implementation.
+
+**Commit (code):** pending — will be recorded after this step is committed.
+
+### What I did
+
+- Added `design/03-dirty-cell-renderer-design-and-implementation-guide.md`.
+- Replaced the previous `ScreenCell { char, fg, bg }` renderer with compact cells:
+
+```cpp
+struct RenderCell {
+  char ch;
+  uint8_t attr;
+};
+```
+
+- Added compact attributes:
+
+```cpp
+AttrNormal
+AttrStatus
+AttrPrompt
+AttrCursor
+```
+
+- Added `attrFg()` / `attrBg()` color lookup functions.
+- Added `desiredCells[Lines][Columns]` and `drawnCells[Lines][Columns]`.
+- Changed rendering so it:
+  - clears desired cells in RAM,
+  - composes transcript/status/input into desired cells,
+  - compares desired cells to drawn cells,
+  - draws only changed cells to the TFT.
+- Kept the `uiDirty` gate so rendering only happens after UI state changes.
+- Updated tasks to record that full redraw flicker was observed and dirty-cell rendering was implemented.
+- Compiled with:
+
+```bash
+arduino-cli compile \
+  --fqbn rp2040:rp2040:rpipico \
+  --build-path build-repl-window-primitives \
+  --warnings all \
+  repl-window-primitives
+```
+
+### Why
+
+A full pixel framebuffer would cost about 204,800 bytes, which is not viable for uLisp on RP2040. But a text-cell renderer is small: 32 rows × 53 columns × 2 bytes per cell × 2 buffers = 6,784 bytes. This gives us flicker reduction without buffering pixels.
+
+### What worked
+
+- The dirty-cell renderer compiles.
+- RAM use is significantly lower than the heavier `char + fg + bg` cell model:
+  - previous `ScreenCell` compile: globals 40,240 bytes,
+  - compact `RenderCell` compile: globals 26,672 bytes.
+- Program storage remains small: 78,512 bytes.
+
+### What didn't work
+
+Before adding the compact renderer, the first attempt used function signatures containing `ScreenCell`. Arduino's `.ino` preprocessor generated prototypes before the struct definition, causing compile errors:
+
+```text
+error: 'ScreenCell' does not name a type
+```
+
+I first fixed that with a forward declaration, then replaced the design with compact `RenderCell` cells. The compact renderer avoids heavy per-cell color storage and is more appropriate for uLisp.
+
+### What I learned
+
+For this hardware, flicker is not a synchronization problem we can solve with vsync-style swapping. We are writing directly to the TFT controller. The practical solution is to minimize visible pixel writes: only draw changed character cells and never clear full rows during normal updates.
+
+### What was tricky to build
+
+The renderer must be RAM-conscious and still expressive enough for cursor/status/prompt coloring. Encoding colors as small attributes rather than storing foreground/background in each cell gives a good balance: small memory footprint, simple comparison, and easy porting.
+
+### What warrants a second pair of eyes
+
+- Whether two full text-cell buffers are acceptable in the final uLisp firmware.
+- Whether `fillRect()` per changed cell is still visible during heavy `/spam` output.
+- Whether uLisp should compose one row at a time to avoid the desired-cell buffer.
+
+### What should be done in the future
+
+- Upload this build to `/pico1-apps` when the SD card is mounted/available.
+- Test whether idle flicker is gone and whether `/spam` output is acceptable.
+- If flicker remains, optimize `drawCellDirect()` to avoid separate `fillRect()` where `tft.drawChar()` with background can fully cover the cell.
+
+### Code review instructions
+
+Review the renderer section in:
+
+```text
+repl-window-primitives/repl-window-primitives.ino
+```
+
+Key symbols:
+
+```text
+RenderCell
+CellAttr
+attrFg
+attrBg
+desiredCells
+drawnCells
+composeTranscript
+composeStatus
+composeInput
+renderAll
+```
+
+Validate with the compile command above, then hardware-test typing, backspace, `/spam`, and `/clear`.
+
+### Technical details
+
+Compile result:
+
+```text
+Sketch uses 78512 bytes (3%) of program storage space. Maximum is 2093056 bytes.
+Global variables use 26672 bytes (10%) of dynamic memory, leaving 235472 bytes for local variables. Maximum is 262144 bytes.
+```

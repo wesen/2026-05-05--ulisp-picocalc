@@ -96,3 +96,14 @@ Corrected primitive firmware upload destination to SD-card /pico1-apps; rebuilt 
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/repl-window-primitives/repl-window-primitives.ino — Source sketch used for corrected /pico1-apps upload
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Recorded corrected SD-card upload destination
 
+
+## 2026-05-05
+
+Implemented lightweight char+attribute dirty-cell renderer after hardware flicker report; added renderer design/implementation guide; compile succeeds with globals reduced to 26,672 bytes compared with the heavier color-per-cell model.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/repl-window-primitives/repl-window-primitives.ino — Replaced row-clearing renderer with dirty text-cell diff renderer
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/design/03-dirty-cell-renderer-design-and-implementation-guide.md — Design and implementation guide for dirty-cell rendering
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Recorded dirty-cell renderer step
+
