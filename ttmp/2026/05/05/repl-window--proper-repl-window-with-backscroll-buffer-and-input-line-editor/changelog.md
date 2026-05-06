@@ -118,3 +118,35 @@ Step 6: Clean rewrite of primitive sketch adding 16-color palette, per-cell fg/b
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/design/04-color-control-codes-bold-and-tft-graphics-primitives.md — Design doc for color/graphics primitives
 - /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/02-primitive-experiment-implementation-diary.md — Recorded Step 6
 
+
+## 2026-05-05
+
+Integration Step 1: extracted primitive REPL window into ulisp-picocalc/repl_window.h, wired pserial/gserial/setup/repl in ulisp-picocalc.ino, renamed comments .ino to .ino.bak so Arduino compiles one sketch, and achieved successful compile; RAM is high at 227760 bytes globals.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/04-integration-implementation-diary.md — Recorded integration Step 1
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ulisp-picocalc/repl_window.h — New REPL window header extracted from primitive sketch
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ulisp-picocalc/ulisp-picocalc.ino — Integrated pserial/gserial/setup/repl with new REPL window
+
+
+## 2026-05-05
+
+Integration Step 2: reduced RP2040 uLisp WORKSPACESIZE from 23000-SDSIZE to 18000-SDSIZE, improving globals from 227760B to 187760B; compiled and uploaded integrated REPL-window firmware to /pico1-apps.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/04-integration-implementation-diary.md — Recorded heap reduction and SD upload
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ulisp-picocalc/repl_window.h — Integrated REPL-window header
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ulisp-picocalc/ulisp-picocalc.ino — Reduced RP2040 WORKSPACESIZE and integrated REPL-window pserial/gserial/setup/repl changes
+
+
+## 2026-05-05
+
+Committed integrated REPL-window firmware changes in nested ulisp-picocalc repo as 84a1e97d8d1ddce56399289f9de51d7a9f4a7cf9.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ttmp/2026/05/05/repl-window--proper-repl-window-with-backscroll-buffer-and-input-line-editor/reference/04-integration-implementation-diary.md — Updated with nested commit hash
+- /home/manuel/code/wesen/2026-05-05--ulisp-picocalc/ulisp-picocalc — Nested firmware repo commit with REPL-window header integration
+

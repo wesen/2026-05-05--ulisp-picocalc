@@ -152,3 +152,17 @@
 - [ ] Test `/demo` on hardware and verify all 16 colors, bold text, and graphics overlay.
 - [ ] Test `/clear-gfx` removes graphics overlay without corrupting text.
 
+
+### Integration Milestone I1 — Header extraction and uLisp wiring
+
+- [x] Create `ulisp-picocalc/repl_window.h` from primitive REPL window components.
+- [x] Remove fake evaluator, icons, and graphics commands from the uLisp integration header.
+- [x] Include `repl_window.h` from `ulisp-picocalc/ulisp-picocalc.ino`.
+- [x] Replace `pserial()` display path with `ReplBackBufferAppend()`.
+- [x] Replace `gserial()` PicoCalc keyboard path with committed edit-buffer input.
+- [x] Initialize the REPL window in `setup()` after TFT init.
+- [x] Render the REPL window after printed evaluation output.
+- [x] Compile integrated uLisp sketch successfully.
+- [ ] Reduce integrated RAM usage below the current 227,760-byte globals footprint.
+- [ ] Hardware-test boot, input editing, Enter commit, evaluation output, and error recovery.
+
