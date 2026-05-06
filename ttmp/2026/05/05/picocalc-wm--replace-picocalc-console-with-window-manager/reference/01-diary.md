@@ -186,3 +186,56 @@ Wrote a 10-chapter literate programming document that reads the PicoCalc console
 - Design the actual window manager architecture (what to build)
 - Prototype Core 1 FIFO communication
 - Implement virtual console data structure
+
+---
+
+## Step 3: Compile and Upload Firmware
+
+Compiled the uLisp PicoCalc firmware and uploaded it to the SD card on the PicoCalc via the Mac at 192.168.0.57.
+
+### Prompt Context
+
+**User prompt (verbatim):** "compile and upload to 192.168.0.57:/Volumes/NO NAME/firmware/"
+
+**Assistant interpretation:** Cross-compile uLisp for RP2040 using arduino-cli, then scp the resulting .uf2 to the PicoCalc's SD card via the Mac.
+
+**Inferred user intent:** Get the latest uLisp build onto the PicoCalc so it can be flashed from the bootloader.
+
+### What I did
+
+- Ran the existing build script `scripts/01-compile-ulisp-picocalc.sh`
+- Build succeeded: `build/ulisp-picocalc-sketch.ino.uf2` (460,800 bytes)
+- First scp attempt failed — SD card was mounted read-only on the Mac
+- `diskutil unmount force` killed the SSH session (our shell was the mount dissenter)
+- User unlocked the SD card (remounted read-write)
+- Second scp succeeded: `/Volumes/NO NAME/firmware/PicoCalc_uLisp_4.8f_wm.uf2`
+
+### What didn't work
+
+- `scp` to read-only FAT32 mount returns "Failure" (unhelpful error message)
+- `diskutil unmount force` on the mount that holds our SSH session kills the connection — the force unmount terminates the process that holds the mount open, which is our own shell
+- `diskutil remount` doesn't exist on macOS (unlike Linux `mount -o remount,rw`)
+
+### What I learned
+
+- macOS mounts FAT32 SD cards read-only by default when they have certain filesystem flags
+- The "dissenter PID" in `diskutil unmount` is very literal — it's your own shell
+- Staging files to `/tmp` first, then copying in a single ssh command, avoids the session-kill problem
+
+### What was tricky to build
+
+- The read-only mount issue was misleading — the scp error was just "Failure" with no indication it was a filesystem permissions problem. Had to `touch` a test file to confirm.
+
+### What should be done in the future
+
+- Flash the firmware from the PicoCalc bootloader and verify it boots
+- Test that the console, keyboard, graphics, and SD card all work with this build
+
+### Technical details
+
+```
+Build: arduino-cli compile --fqbn rp2040:rp2040:rpipico
+Output: 211,448 bytes code (10% flash), 193,800 bytes global vars (73% RAM)
+Warnings: longjmp clobbering (expected), no touch CS (expected — no touchscreen)
+Upload: scp → manuel@192.168.0.57:/Volumes/NO NAME/firmware/PicoCalc_uLisp_4.8f_wm.uf2
+```
